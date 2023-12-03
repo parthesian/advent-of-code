@@ -22,13 +22,8 @@ def make_trie(words, rev):
     root = dict()
     for word in words:
         current_dict = root
-        if not rev:
-            for letter in word:
-                current_dict = current_dict.setdefault(letter, {})
-        else:
-            for letter in word[::-1]:
-                current_dict = current_dict.setdefault(letter, {})
-
+        for letter in word[::-1] if rev else word:
+            current_dict = current_dict.setdefault(letter, {})
         current_dict[_end] = _end
     return root
 # checks if a word is fully in the trie
@@ -42,19 +37,13 @@ def in_trie(trie, word):
 # checks if a word is partially in the trie
 # returns 0 if not found, 1 if found, otherwise None
 def partial_match(trie, word, index):
-    current_dict = trie
-    idx = 0
+    current_dict, idx = trie, 0
     for letter in word[index:]:
-        if letter not in current_dict:
-            return 0
-        if _end in current_dict[letter]:
-            return idx + 1
-        current_dict = current_dict[letter]
-        idx = idx + 1
+        if (letter not in current_dict) or (_end in current_dict[letter]):
+            return 0 if letter not in current_dict else idx + 1
+        current_dict, idx = current_dict[letter], idx + 1
 def solveLine(line, trie, trie2):
-    ret1 = 0
-    ret2 = 0
-    idx = 0
+    ret1, ret2, idx = 0,0,0
     for ch in line:
         if ch.isdigit():
             ret1 = ch
@@ -64,8 +53,7 @@ def solveLine(line, trie, trie2):
             ret1 = nums[line[idx:ans + idx]]
             break
         idx = idx + 1
-    idx = 0
-    rev_line = line[::-1]
+    idx, rev_line = 0, line[::-1]
     for ch in rev_line:
         if ch.isdigit():
             ret2 = ch
@@ -77,9 +65,6 @@ def solveLine(line, trie, trie2):
         idx = idx + 1
     return ret1 + ret2
 
-
-
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     newLines = readFile()
@@ -88,7 +73,6 @@ if __name__ == '__main__':
     trie2 = make_trie(written_numbers, True)
     idx = 0
     for line in newLines:
-        print(line)
         res = solveLine(line, trie, trie2)
         sum = sum + int(res)
         print(res, "new sum = ", sum)
