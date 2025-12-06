@@ -1,0 +1,53 @@
+with open('input.txt', 'r') as f:
+    input_data = [line.strip() for line in f if line.strip()]
+
+multiply_buckets = []
+add_buckets = []
+operators = ['+', '*']
+
+def process_section(section):
+    numbers = [''] * len(section[0])
+    
+    for line in section:
+        for i, char in enumerate(reversed(line)):
+            if char == ' ' and numbers[i] and numbers[i][-1] != '0':
+                continue
+            numbers[i] += '0' if char == ' ' else char
+    
+    return [int(num) for num in numbers]
+
+operator_line = input_data[-1]
+last_operator = 0
+
+for i, char in enumerate(operator_line):
+    if char in operators and i != 0:
+        section = [line[last_operator:i-1] for line in input_data[:-1]]
+        bucket = process_section(section)
+        
+        if operator_line[last_operator] == '+':
+            add_buckets.append(bucket)
+        else:
+            multiply_buckets.append(bucket)
+        
+        last_operator = i
+
+section = [line[last_operator:] for line in input_data[:-1]]
+bucket = process_section(section)
+
+if operator_line[last_operator] == '+':
+    add_buckets.append(bucket)
+else:
+    multiply_buckets.append(bucket)
+
+total = 0
+
+for bucket in multiply_buckets:
+    val = 1
+    for item in bucket:
+        val *= item
+    total += val
+
+for bucket in add_buckets:
+    total += sum(bucket)
+
+print(total)
